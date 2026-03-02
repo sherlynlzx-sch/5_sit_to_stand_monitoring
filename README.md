@@ -43,7 +43,7 @@ INFERENCE (each patient visit, at home)
 - 50,727 rows of pre-extracted OpenPose keypoints
 - Labels: `sit` (12,979 rows) and `stand` (37,748 rows)
 - Source: https://dayta.nwu.ac.za/articles/dataset/Human_pose_dataset_sit_stand_pose_classes_/23290937
-- Download and rename to `nwu_sit_stand.csv`
+- Download and rename to `dataset_HumanPose_KeypointCoordinates.xlsx`
 
 The NWU dataset provides static pose frames, not video. Synthetic temporal windows of 60 frames are constructed during training to match the sequential input the model sees during live inference.
 
@@ -82,9 +82,9 @@ Dense(1, sigmoid)      ← probability of 'standing' state
 ---
 
 ## Installation
-
+ensure setuptools ~= version 80
 ```bash
-pip install tensorflow tensorflow-hub opencv-python numpy pandas scikit-learn tqdm
+pip install tensorflow tensorflow-hub opencv-python numpy pandas scikit-learn tqdm ipykernel openpyxl
 ```
 
 ---
@@ -117,7 +117,7 @@ pip install tensorflow tensorflow-hub opencv-python numpy pandas scikit-learn tq
 ```python
 from pipeline_5sts import load_nwu_dataset, build_synthetic_windows, build_model, train_model
 
-X, y         = load_nwu_dataset("nwu_sit_stand.csv")
+X, y         = load_nwu_dataset("dataset_HumanPose_KeypointCoordinates.xlsx")
 X_win, y_win = build_synthetic_windows(X, y)
 model        = build_model()
 model        = train_model(model, X_train, y_train, X_val, y_val)
@@ -158,9 +158,6 @@ report   = compare(baseline, followup)
 **Why MoveNet over MediaPipe**
 MoveNet outputs 17 COCO keypoints — the same joint space used by the NWU training data. This eliminates the need for an adapter layer between training and inference, and MoveNet Lightning runs in real-time (~6ms/frame) on low-end home devices.
 
-**Why NWU over Kinetics**
-Both Kinetics-400 and Kinetics-700 were verified to contain no sit, stand, sitting down, or standing up labels. NWU provides 50k+ pre-extracted keypoints with exact sit/stand labels and no video processing overhead.
-
 **Sit class oversampling**
 The NWU dataset has a 2.9:1 stand:sit imbalance. A tighter sliding window step for the sit class (seq_len//6 vs seq_len//2) balances the training windows to ~1:1, directly improving Sit F1 from 0.83 to 0.95.
 
@@ -176,4 +173,3 @@ Stand is called at prob ≥ 0.65 and sit at prob ≤ 0.35 (tighter than the defa
 
 - Training data (NWU) consists of static public images, not real patient videos. A domain gap exists between NWU keypoints and home webcam footage. Fine-tuning on a small set of real patient recordings is recommended before clinical deployment.
 - MoveNet SinglePose works best when only one person is visible in the frame. Ensure the patient is filmed alone against a clear background.
-- Gait speed monitoring is handled separately in `pipeline_gait.py`. A unified clinical report combining both tests is available in `pipeline_assessment.py`.
