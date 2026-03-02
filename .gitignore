@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / scraped files
+__pycache__/
+*.pyc
+*~
+*.swp
+*.pyo
+# setuptools files
+.eggs/
+*.egg
+*.egg-info/
+# virtual environment
+venv/
+env/
+.venv/
+# IDEs and editors
+.idea/
+.vscode/
+# OS-specific files
+.DS_Store
+Thumbs.db
+# build/packaging
+dist/
+build/
+*.spec
+# log and test files
+*.log
+# coverage
+.coverage
+.tox/
+# models
+models/*.keras
