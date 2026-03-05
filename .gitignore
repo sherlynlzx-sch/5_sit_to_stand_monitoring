@@ -29,3 +29,5 @@ build/
 .tox/
 # models
 models/*.keras
+# exclude data files
+test_data
